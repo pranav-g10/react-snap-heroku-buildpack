@@ -1,4 +1,20 @@
 #!/usr/bin/env bash
 
+function sitemap() {
+    base='https://www.pixylz.com'
+    appEnv=`cat $3/REACT_APP_ENV`
+    if [[ "$appEnv" == "staging" ]]; then
+        base='https://pixylz-web.herokuapp.com'
+    fi
+    echo "$base/" > "$1/public/sitemap.txt"
+    find "$1/scraper/output" -type d | \
+        grep "\/products\/" | \
+        grep -v "templates" | \
+        sed -e "s|.*products|$base/products|" > \
+        "$1/public/sitemap.txt"
+}
+
 cd $1
-$1/node_modules/react-snap/run.js && rm -rf $1/.apt
+$1/node_modules/react-snap/run.js && \
+    rm -rf $1/.apt && \
+    sitemap $1 $2 $3
